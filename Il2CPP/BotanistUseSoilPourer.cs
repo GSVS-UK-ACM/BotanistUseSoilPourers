@@ -15,7 +15,7 @@ using System.Text.Json.Serialization;
 using UnityEngine;
 using Il2CppScheduleOne;
 
-[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.1", "Fortis")]
+[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.2", "Fortis")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace BotanistUseSoilPourer;
@@ -212,7 +212,7 @@ public class BotanistUseSoilPourerMod : MelonMod
     {
         Log("(GetSoilPourer) Fired", LogLevel.Debug);
         Coordinate assignedPotCoords = new Coordinate(pot.OriginCoordinate);
-        Log($"(GetPotSoilPourers) Assigned Pot Coords x: {assignedPotCoords.x}, y: {assignedPotCoords.y}", LogLevel.Debug);
+        Log($"(GetPotSoilPourer) Assigned Pot Coords x: {assignedPotCoords.x}, y: {assignedPotCoords.y}", LogLevel.Debug);
         List<SoilPourer> pourersAroundPot = new List<SoilPourer>();
         for (int t = 1; t < 4; t++)
         {
@@ -233,22 +233,22 @@ public class BotanistUseSoilPourerMod : MelonMod
             {
                 if (tiles[i] is null)
                 {
-                    Log($"(GetPotSoilPourers) Tile at index {i} is null, skipping", LogLevel.Debug);
+                    Log($"(GetPotSoilPourer) Tile at index {i} is null, skipping", LogLevel.Debug);
                     continue;
                 }
-                Log($"(GetPotSoilPourers) Checking tile at x: {tiles[i].x}, y: {tiles[i].y}", LogLevel.Debug);
+                Log($"(GetPotSoilPourer) Checking tile at x: {tiles[i].x}, y: {tiles[i].y}", LogLevel.Debug);
                 if (!TryGetSoilPourer(tiles[i], out SoilPourer? pourer))
                 {
-                    Log($"(GetPotSoilPourers) Tile at x: {tiles[i].x}, y: {tiles[i].y} contains no soil pourers", LogLevel.Debug);
+                    Log($"(GetPotSoilPourer) Tile at x: {tiles[i].x}, y: {tiles[i].y} contains no soil pourers", LogLevel.Debug);
                     continue;
                 }
                 if (pourer is null)
                 {
-                    Log($"(GetPotSoilPourers) Tile at x: {tiles[i].x}, y: {tiles[i].y} contains a soil pourer but soil pourer returned is null", LogLevel.Warn);
+                    Log($"(GetPotSoilPourer) Tile at x: {tiles[i].x}, y: {tiles[i].y} contains a soil pourer but soil pourer returned is null", LogLevel.Warn);
                     continue;
                 }
 
-                Log($"(GetPotSoilPourers) Soil Pourer found at x: {tiles[i].x}, y: {tiles[i].y}", LogLevel.Debug);
+                Log($"(GetPotSoilPourer) Soil Pourer found at x: {tiles[i].x}, y: {tiles[i].y}", LogLevel.Debug);
                 pourersAroundPot.Add(pourer);
             }
         }
@@ -257,58 +257,26 @@ public class BotanistUseSoilPourerMod : MelonMod
         if (pourersAroundPot.Count <= 0)
             return potPourer;
 
-        Log($"(GetPotSoilPourers) pourersAroundPot Count: {pourersAroundPot.Count}", LogLevel.Debug);
+        Log($"(GetPotSoilPourer) pourersAroundPot Count: {pourersAroundPot.Count}", LogLevel.Debug);
 
         for (int i = 0; i < pourersAroundPot.Count; i++)
         {
             Coordinate pourerCoords = new Coordinate(pourersAroundPot[i].OriginCoordinate);
-            Log($"(GetPotSoilPourers) Checking if soil pourer at x: {pourerCoords.x}, y: {pourerCoords.y} pot is assigned pot", LogLevel.Debug);
-            Coordinate coord1 = new Coordinate(pourersAroundPot[i].OriginCoordinate) + Coordinate.RotateCoordinates(new Coordinate(0, 1), pourersAroundPot[i].Rotation);
-            Coordinate coord2 = new Coordinate(pourersAroundPot[i].OriginCoordinate) + Coordinate.RotateCoordinates(new Coordinate(1, 1), pourersAroundPot[i].Rotation);
-            Tile tile = pourersAroundPot[i].OwnerGrid.GetTile(coord1);
-            Tile tile2 = pourersAroundPot[i].OwnerGrid.GetTile(coord2);
+            Log($"(GetPotSoilPourer) Checking if soil pourer at x: {pourerCoords.x}, y: {pourerCoords.y} pot is assigned pot", LogLevel.Debug);
 
-            List<Pot> pots = new List<Pot>();
-            if (tile != null && tile2 != null)
+            var pourerPots = pourersAroundPot[i].GetPots();
+            foreach (Pot potsForPourer in pourerPots)
             {
-                Pot? tilePot = null;
-                foreach (GridItem item in tile.BuildableOccupants)
+                Coordinate potPourerCoords = new Coordinate(potsForPourer.OriginCoordinate);
+                Log($"(GetPotSoilPourer) Checking if pot at x: {potPourerCoords.x}, y: {potPourerCoords.y} matches assigned pot at x: {potPourerCoords.x}, y: {potPourerCoords.y}", LogLevel.Debug);
+                if (potPourerCoords.x == assignedPotCoords.x && potPourerCoords.y == assignedPotCoords.y)
                 {
-                    if (item.TryGetComponent<Pot>(out Pot itemPot))
-                    {
-                        tilePot = itemPot;
-                        break;
-                    }
-                }
-
-                if (tilePot != null && tile2.BuildableOccupants.Contains(tilePot))
-                {
-                    pots.Add(tilePot);
-                }
-            }
-
-            if (pots.Count <= 0)
-            {
-                Log("(GetPotSoilPourers) Tile pots count is 0 or less", LogLevel.Debug);
-                return potPourer;
-            }
-
-            Log($"(GetPotSoilPourers) Soil pourer pots count: {pots.Count}", LogLevel.Debug);
-
-            for (int p = 0; p < pots.Count; p++)
-            {
-                Coordinate tilePotCoords = new Coordinate(pots[p].OriginCoordinate);
-                Log($"(GetPotSoilPourers) Checking soil pourer pot at x: {tilePotCoords.x}, y: {tilePotCoords.y} matches assigned pot at x: {assignedPotCoords.x}, y {assignedPotCoords.y}", LogLevel.Debug);
-                if (tilePotCoords.x == assignedPotCoords.x && tilePotCoords.y == assignedPotCoords.y)
-                {
-                    Log("(GetPotSoilPourers) Adding Soil pourer", LogLevel.Debug);
+                    Log("(GetPotSoilPourer) Pot matched, returning soil pourer", LogLevel.Debug);
                     potPourer = pourersAroundPot[i];
-                    break;
                 }
             }
         }
 
-        Log($"(GetPotSoilPourers) Soil pourer to be activated is null: {potPourer is null}", LogLevel.Debug);
         return potPourer;
     }
 
