@@ -15,7 +15,7 @@ using System.Text.Json.Serialization;
 using UnityEngine;
 using Il2CppScheduleOne;
 
-[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.2", "Fortis")]
+[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.3", "Fortis")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace BotanistUseSoilPourer;
@@ -162,7 +162,7 @@ public class BotanistUseSoilPourerMod : MelonMod
         }
         behaviour.StopPerformAction();
         behaviour.CompleteAction();
-        behaviour.SendEnd();
+        behaviour.End_Server();
         behaviour.botanist.SetIdle(true);
     }
 

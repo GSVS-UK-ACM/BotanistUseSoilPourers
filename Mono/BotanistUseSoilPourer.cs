@@ -18,7 +18,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.2", "Fortis")]
+[assembly: MelonInfo(typeof(BotanistUseSoilPourerMod), "Botanist Use Soil Pourer", "1.0.3", "Fortis")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace BotanistUseSoilPourer;
@@ -184,7 +184,7 @@ public class BotanistUseSoilPourerMod : MelonMod
 
             StopPerformAction.Invoke(behaviour, null);
             CompleteAction.Invoke(behaviour, null);
-            behaviour.SendEnd();
+            behaviour.End_Server();
 
             Botanist botanist = behaviour.Npc as Botanist;
             if (botanist is not null)
