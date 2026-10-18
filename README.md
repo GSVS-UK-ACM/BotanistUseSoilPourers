@@ -1,27 +1,65 @@
 # BotanistUseSoilPourers
-A Schedule I quality of life mod. This mod makes Botanist use a soil pourer if it exists, this improves the time it takes for them to soil pots.
 
-## Changes
-- If a soil pourer has soil in it, the botanist will go straight to the pot and use the pourer instead of going to supply rack
-- If a soil pourer has NO soil in it, the botanist will behave normally and go to supply shelf first, when at the pot, it will use the soil pourer instead of manually pouring
-- Because of certain in-game mechanics, the soil pourers for botanists will be instantaneous so no animation is played, the soil pourer activated sound will still play
-	- Soil pourers will behave normally for users
+Botanists can use linked soil pourers while working with pots. This repository was created by Fortis.
 
-Works with multiplayer, per testing only the host needs the mod.
+Version 1.1.0 updates the IL2CPP build for Schedule I 0.4.7f12.
 
-Pairs well with my other Botanist mod
+## What changed
 
-Nexus:
-[BotanistUseSprinkler](https://www.nexusmods.com/schedule1/mods/1080)
+- Uses the current grow-container behaviours instead of the removed `PotActionBehaviour` type.
+- Detects linked soil pourers and lets botanists use them during the planting workflow.
+- Supports a configurable capacity from 1 to 8 soil bags. The default is 2.
+- Consumes one stored charge for each pot filled.
+- Allows manual and botanist soil-pourer top-ups.
+- Lets idle botanists refill pourers before the next planting cycle.
+- Keeps the seed handoff ready so planting can continue after soil is dispensed.
+- Uses host-authoritative charge state in multiplayer.
+- Falls back to the normal soil-bag workflow when a pourer cannot be used.
+- Reduces unnecessary device scans and stops off-hours polling from 04:00 to 07:00.
 
-Thunderstore:
-[BotanistUseSprinkler](https://thunderstore.io/c/schedule-i/p/Fortis/BotanistUseSprinkler/)
+## Configuration
 
-# Installation
-- Install [MelonLoader](https://melonwiki.xyz/#/?id=requirements)
+The configuration file is created at:
 
-## Base Game (IL2CPP) Version
-- Drag `BotanistUseSoilPourer.dll` into the `Mods` folder
+`UserData/BotanistUseSoilPourer/configuration.json`
 
-## Alternate (Mono) Version
-- Drag `BotanistUseSoilPourer_Mono.dll` into the `Mods` folder
+Default configuration:
+
+```json
+{
+  "enabled": true,
+  "autoRefillSoilPourers": true,
+  "soilPourerCapacity": 2,
+  "allowManualMultiBagFill": true,
+  "debug": false
+}
+```
+
+- `enabled` turns the mod on or off.
+- `autoRefillSoilPourers` lets botanists top up linked pourers when they would otherwise be idle.
+- `soilPourerCapacity` sets how many soil bags each pourer can hold, from 1 to 8.
+- `allowManualMultiBagFill` enables the player interaction for inserting extra soil bags.
+- `debug` enables extra diagnostic logging.
+
+## Installation
+
+1. Install MelonLoader for the IL2CPP version of Schedule I.
+2. Put `BotanistUseSoilPourer.dll` in the game's `Mods` folder.
+3. In multiplayer, every participant should use the same DLL and configuration.
+
+The Mono project is retained for reference. It is not part of this compatibility update.
+
+## Building
+
+Build with .NET 6 and point `MelonLoaderRoot` at the game's MelonLoader directory:
+
+```powershell
+dotnet build Il2CPP/BotanistUseSoilPourer.csproj --configuration Release --property:MelonLoaderRoot="C:\Program Files (x86)\Steam\steamapps\common\Schedule I\MelonLoader"
+```
+
+Game and MelonLoader assemblies are referenced from the local installation. They are not committed to this repository.
+
+## Credits
+
+- Original mod by Fortis.
+- Schedule I 0.4.7f12 compatibility update contributed by GSVS UK ACM / xboxnuker-rgb.
