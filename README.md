@@ -1,3 +1,9 @@
+<!-- GSVS-REPOSITORY-MIGRATION -->
+> **New repository home:** This project moved from `xboxnuker-rgb/BotanistUseSoilPourers` to
+> [GSVS-UK-ACM/BotanistUseSoilPourers](https://github.com/GSVS-UK-ACM/BotanistUseSoilPourers).
+> Existing GitHub links redirect here. Continue using this repository under its
+> organisation address. Existing local checkouts can keep their folders.
+
 # BotanistUseSoilPourers
 A Schedule I quality of life mod. This mod makes Botanist use a soil pourer if it exists, this improves the time it takes for them to soil pots.
 
